@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 """***************************************************************
-**  Program Name:   BGG	     				        **
-**  Version Number: V0.5                                        **
+**  Program Name:   BGGStatus				        **
+**  Version Number: V0.6                                        **
 **  Copyright (C):  September 3, 2014 Richard W. Allen          **
 **  Date Started:   September 3, 2014                           **
-**  Date Ended:     September 3, 2014                           **
+**  Date Ended:     May 15, 2019                                **
 **  Author:         Richardn W. Allen                           **
 **  Webpage:        http://www.richardallenonline.com           **
-**  IDE:            IDLE 2.7.4                                  **
-**  Compiler:       Python 2.7.4                                **
-**  Langage:        Python 2.7.4				**
+**  IDE:            IDLE 3.6.5                                  **
+**  Compiler:       Python 3.6.5                                **
+**  Langage:        Python 3.6.5				**
 **  License:	    GNU GENERAL PUBLIC LICENSE Version 2	**
 **		    see license.txt for for details	        **
 ***************************************************************"""
@@ -27,7 +27,10 @@ from Module.GameInfo import GameInfo
 
 class BGGStats:
     def __init__(self):
-        self.url = "http://www.boardgamegeek.com/xmlapi2/plays?username=SumGuyV5&pagesize=100&page="
+        self.pagesize = 100
+        self.username = "SumGuyV5"
+        
+        self.url = "http://www.boardgamegeek.com/xmlapi2/plays?username=" + self.username + "&pagesize=" + str(self.pagesize) + "&page="
         self.filename = "plays.xml"
 
         self.plays = []
@@ -42,7 +45,7 @@ class BGGStats:
         while (count <= countto):
             self._Download(count)
             self._Read()
-            countto = math.ceil(self.readXML.playcount / 100.0)
+            countto = math.ceil(self.readXML.playcount / float(self.pagesize))
             count += 1
             
         self._LoadInfo()
@@ -55,7 +58,7 @@ class BGGStats:
             if (play.incomplete == 0) and (play.nowinstate == 0):
                 for player in play.players:
                     if (self._AddPlayer(player.username, player.name, player.win, play.gamename) == False):
-                        print "Error Player not found!"
+                        print("Error Player not found!")
 
     def _AddPlayer(self, username, name, win, gameName):
         found = False
@@ -103,16 +106,16 @@ class BGGStats:
     def _Print(self):
         for player in self.playersInfo:
             player.LoadGameInfo()
-            print ""
-            print "Name: " + player.name
-            print "Wins: " + str(player.wincount)
-            print "Loss: " + str(player.losscount)
-            print "You have won " + str(round(player.winpercentage,2)) + "% of the games you have played."
-            print "Most of your wins have come from " + player.winGameInfo.name + ", with " + str(player.winGameInfo.win) + " wins out of " + str(player.winGameInfo.count) + " games."
-            print "Most of your loss have come from " + player.lossGameInfo.name + ", with " +  str(player.lossGameInfo.loss) + " loss out of " + str(player.lossGameInfo.count) + " games."
-            print "Your h-index is: " + str(player.hIndex)
+            print ("\n")
+            print ("Name: " + player.name)
+            print ("Wins: " + str(player.wincount))
+            print ("Loss: " + str(player.losscount))
+            print ("You have won " + str(round(player.winpercentage,2)) + "% of the games you have played.")
+            print ("Most of your wins have come from " + player.winGameInfo.name + ", with " + str(player.winGameInfo.win) + " wins out of " + str(player.winGameInfo.count) + " games.")
+            print ("Most of your loss have come from " + player.lossGameInfo.name + ", with " +  str(player.lossGameInfo.loss) + " loss out of " + str(player.lossGameInfo.count) + " games.")
+            print ("Your h-index is: " + str(player.hIndex))
             #print "For every " + str(player.winratio) + " games you have won, you have lost 1 game."
-            print "Total Games Played: " + str(player.wincount + player.losscount)
+            print ("Total Games Played: " + str(player.wincount + player.losscount))
 
     def _WinRatio(self):
         for player in self.playersInfo:

@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 """***************************************************************
-**  Program Name:   BGG	     				        **
-**  Version Number: V0.5                                        **
+**  Program Name:   BGGStatus				        **
+**  Version Number: V0.6                                        **
 **  Copyright (C):  September 3, 2014 Richard W. Allen          **
 **  Date Started:   September 3, 2014                           **
-**  Date Ended:     September 3, 2014                           **
+**  Date Ended:     May 15, 2019                                **
 **  Author:         Richardn W. Allen                           **
 **  Webpage:        http://www.richardallenonline.com           **
-**  IDE:            IDLE 2.7.4                                  **
-**  Compiler:       Python 2.7.4                                **
-**  Langage:        Python 2.7.4				**
+**  IDE:            IDLE 3.6.5                                  **
+**  Compiler:       Python 3.6.5                                **
+**  Langage:        Python 3.6.5				**
 **  License:	    GNU GENERAL PUBLIC LICENSE Version 2	**
 **		    see license.txt for for details	        **
 ***************************************************************"""
@@ -17,8 +17,8 @@ import os
 import sys
 sys.path.append('Module.zip')
 
-from PlaysDataset import PlaysDataset
-from PlayerDataset import PlayerDataset
+from Module.PlaysDataset import PlaysDataset
+from Module.PlayerDataset import PlayerDataset
 
 from xml.dom.minidom import parse, getDOMImplementation
 
@@ -34,7 +34,7 @@ class ReadXML:
         try:
             self._dom = parse(filename)
         except:
-            print 'File IO Error on file name ' + filename
+            print ('File IO Error on file name ' + filename)
 
         plays_info = self._dom.getElementsByTagName("plays")
         for play_info in plays_info:
@@ -77,13 +77,13 @@ class ReadXML:
 
 if __name__ == "__main__":
 
-    print "Testing... ReadXML Class"
+    print ("Testing... ReadXML Class")
     read = ReadXML()
 
     read.ReadXMLFile(os.getcwd() + '\\..\\plays.xml')
 
     for play in read.plays:
-        print "Name: " + play.gamename
+        print ("Name: " + play.gamename)
         """ #print "Username: " + player.username
         print "Name: " + player.name
         print "Wins: " + str(player.wincount)
