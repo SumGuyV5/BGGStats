@@ -15,6 +15,8 @@
 ***************************************************************"""
 from urllib.request import urlretrieve
 
+import time
+
 class DownloadXML:
     def __init__(self, url, filename):
         """init the variables"""
@@ -22,6 +24,7 @@ class DownloadXML:
         self.filename = filename
 
     def Download(self):
+        time.sleep(2)
         print ("Download Starting!")
         print (self.url)
         urlretrieve(self.url, self.filename)
