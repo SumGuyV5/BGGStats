@@ -16,14 +16,16 @@
 import os
 import math
 import sys
-sys.path.append('Module.zip')
+sys.path.append('BGGModule.zip')
 
-from Module.PlaysDataset import PlaysDataset
-from Module.PlayerDataset import PlayerDataset
-from Module.PlayerInfo import PlayerInfo
-from Module.ReadXML import ReadXML
-from Module.DownloadXML import DownloadXML
-from Module.GameInfo import GameInfo
+from BGGModule.PlaysDataset import PlaysDataset
+from BGGModule.PlayerDataset import PlayerDataset
+from BGGModule.PlayerInfo import PlayerInfo
+from BGGModule.ReadXML import ReadXML
+from BGGModule.DownloadXML import DownloadXML
+from BGGModule.GameInfo import GameInfo
+
+import BGGModule.Functions
 
 class BGGStats:
     def __init__(self):
@@ -40,13 +42,10 @@ class BGGStats:
         self.readXML = ReadXML()
 
     def Main(self):
-        count = 1
-        countto = 1
-        while (count <= countto):
-            self._Download(count)
-            self._Read()
-            countto = math.ceil(self.readXML.playcount / float(self.pagesize))
-            count += 1
+        countto = self.BGGModule.Functions.PlayCount(self.username, self.pagesize)
+
+        self.downloadXML.DownloadAll(countto)
+        self.readXML.ReadXMLAll(os.path.join(os.getcwd(), "plays"), self.countto)
             
         self._LoadInfo()
         self._WinPercentage()
@@ -94,7 +93,7 @@ class BGGStats:
         self.downloadXML.Download()
 
     def _Read(self):
-        self.readXML.ReadXMLFile(os.getcwd() + '\\' + self.filename)
+        self.readXML.ReadXMLFile(os.path.join(os.getcwd(), self.filename))
         self.plays = self.readXML.plays
 
     def _SortPlayers(self, sortby):
