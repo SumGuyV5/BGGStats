@@ -35,17 +35,15 @@ class BGGStats:
         self.url = "http://www.boardgamegeek.com/xmlapi2/plays?username=" + self.username + "&pagesize=" + str(self.pagesize) + "&page="
         self.filename = "plays.xml"
 
-        self.plays = []
         self.playersInfo = []
         
         self.downloadXML = DownloadXML(self.url, self.filename)
         self.readXML = ReadXML()
 
     def Main(self):
-        countto = self.BGGModule.Functions.PlayCount(self.username, self.pagesize)
-
-        self.downloadXML.DownloadAll(countto)
-        self.readXML.ReadXMLAll(os.path.join(os.getcwd(), "plays"), self.countto)
+        countto = BGGModule.Functions.PlayCount(self.username, self.pagesize)
+        self.downloadXML.DownloadAll(self.url, "plays", countto)
+        self.readXML.ReadXMLAll(os.path.join(os.getcwd(), "plays"), countto)
             
         self._LoadInfo()
         self._WinPercentage()
@@ -53,7 +51,7 @@ class BGGStats:
         self._Print()
 
     def _LoadInfo(self):
-        for play in self.plays:
+        for play in self.readXML.plays:
             if (play.incomplete == 0) and (play.nowinstate == 0):
                 for player in play.players:
                     if (self._AddPlayer(player.username, player.name, player.win, play.gamename) == False):
@@ -92,9 +90,9 @@ class BGGStats:
         self.downloadXML.url = self.url + str(number)
         self.downloadXML.Download()
 
-    def _Read(self):
-        self.readXML.ReadXMLFile(os.path.join(os.getcwd(), self.filename))
-        self.plays = self.readXML.plays
+    #def _Read(self):
+   #     self.readXML.ReadXMLFile(os.path.join(os.getcwd(), self.filename))
+    #    self.plays = self.readXML.plays
 
     def _SortPlayers(self, sortby):
         if (sortby == "wincount"):
