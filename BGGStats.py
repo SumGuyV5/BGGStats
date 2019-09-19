@@ -3,7 +3,7 @@
 **  Program Name:   BGGStatus				        **
 **  Version Number: V0.6                                        **
 **  Copyright (C):  September 3, 2014 Richard W. Allen          **
-**  Date Started:   September 3, 2014                           **
+**  Date Started:   September 18, 2019                           **
 **  Date Ended:     May 15, 2019                                **
 **  Author:         Richard W. Allen                           **
 **  Webpage:        http://www.richardallenonline.com           **
@@ -39,10 +39,12 @@ class BGGStats:
         
         self.downloadXML = DownloadXML(self.url, self.filename)
         self.readXML = ReadXML()
+        self.re_download = True
 
     def main(self):
         count_to = BGGModule.Functions.play_count(self.username, self.pagesize)
-        # self.downloadXML.download_all(self.url, "plays", count_to)
+        if self.re_download:
+            self.downloadXML.download_all(self.url, "plays", count_to)
         self.readXML.read_xml_all(os.path.join(os.getcwd(), "plays"), count_to)
             
         self.load_info()
