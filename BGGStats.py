@@ -16,10 +16,8 @@
 import os
 import BGGModule.Functions
 
-from BGGModule.PlayerInfo import PlayerInfo
 from BGGModule.ReadXML import ReadXML
 from BGGModule.DownloadXML import DownloadXML
-from BGGModule.GameInfo import GameInfo
 
 
 class BGGStats:
@@ -47,45 +45,9 @@ class BGGStats:
             self.downloadXML.download_all(self.url, "plays", count_to)
         self.readXML.read_xml_all(os.path.join(os.getcwd(), "plays"), count_to)
             
-        self.load_info()
+        self.players_info = self.readXML.load_info()
         self.sort_players("winpercentage")
         self.print_stats()
-
-    def load_info(self):
-        for play in self.readXML.plays:
-            if (play.incomplete == 0) and (play.now_in_state == 0):
-                players_points = play.points()
-                for player in play.players:
-                    if self.add_player(player.username, player.name, player.win, play.game_name, players_points[player.name]) is False:
-                        print("Error Player not found!")
-
-    def add_player(self, username, name, win, game_name, points):
-        found = False
-        for player_info in self.players_info:
-            if (player_info.username == username) and (player_info.name == name):
-                found = True
-                self.add_game_info(game_name, win, player_info)
-                if win is True:
-                    player_info.win_count += 1
-                else:
-                    player_info.loss_count += 1
-                player_info.points += points
-        if found is False:
-            self.players_info.append(PlayerInfo(name, username))
-            found = self.add_player(username, name, win, game_name, points)
-
-        return found
-
-    def add_game_info(self, name, win, player_info):
-        found = False
-        for game_info in player_info.games_info:
-            if game_info.name == name:
-                found = True
-                game_info.add_count(win)
-        if found is False:
-            player_info.games_info.append(GameInfo(name))
-            found = self.add_game_info(name, win, player_info)
-        return found
 
     def download(self, number):
         self.downloadXML.url = self.url + str(number)
