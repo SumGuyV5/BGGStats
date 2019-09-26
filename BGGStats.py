@@ -35,11 +35,11 @@ class BGGStats:
             f'&pagesize={str(self.pagesize)}&page='
         self.filename = "plays.xml"
 
-        self.playersInfo = []
+        self.players_info = []
         
         self.downloadXML = DownloadXML(self.url, self.filename)
         self.readXML = ReadXML()
-        self.re_download = True
+        self.re_download = False
 
     def main(self):
         count_to = BGGModule.Functions.play_count(self.username, self.pagesize)
@@ -53,66 +53,69 @@ class BGGStats:
 
     def load_info(self):
         for play in self.readXML.plays:
-            if (play.incomplete == 0) and (play.nowinstate == 0):
+            if (play.incomplete == 0) and (play.now_in_state == 0):
+                players_points = play.points()
                 for player in play.players:
-                    if self.add_player(player.username, player.name, player.win, play.gamename) is False:
+                    if self.add_player(player.username, player.name, player.win, play.game_name, players_points[player.name]) is False:
                         print("Error Player not found!")
 
-    def add_player(self, username, name, win, gamename):
+    def add_player(self, username, name, win, game_name, points):
         found = False
-        for playerInfo in self.playersInfo:
-            if (playerInfo.username == username) and (playerInfo.name == name):
+        for player_info in self.players_info:
+            if (player_info.username == username) and (player_info.name == name):
                 found = True
-                self.add_game_info(gamename, win, playerInfo)
+                self.add_game_info(game_name, win, player_info)
                 if win is True:
-                    playerInfo.wincount += 1
+                    player_info.win_count += 1
                 else:
-                    playerInfo.losscount += 1
+                    player_info.loss_count += 1
+                player_info.points += points
         if found is False:
-            self.playersInfo.append(PlayerInfo(name, username))
-            found = self.add_player(username, name, win, gamename)
+            self.players_info.append(PlayerInfo(name, username))
+            found = self.add_player(username, name, win, game_name, points)
 
         return found
 
-    def add_game_info(self, name, win, playerinfo):
+    def add_game_info(self, name, win, player_info):
         found = False
-        for game_info in playerinfo.gameinfo:
+        for game_info in player_info.games_info:
             if game_info.name == name:
                 found = True
                 game_info.add_count(win)
         if found is False:
-            playerinfo.gameinfo.append(GameInfo(name))
-            found = self.add_game_info(name, win, playerinfo)
+            player_info.games_info.append(GameInfo(name))
+            found = self.add_game_info(name, win, player_info)
         return found
 
     def download(self, number):
         self.downloadXML.url = self.url + str(number)
         self.downloadXML.download()
 
-    def sort_players(self, sortby):
-        for player in self.playersInfo:
-            player.load_game_info()
-        if sortby == "wincount":
-            self.playersInfo = sorted(self.playersInfo, key=lambda playersinfo: playersinfo.wincount, reverse=True)
-        elif sortby == "winpercentage":
-            self.playersInfo = sorted(self.playersInfo, key=lambda playersinfo: playersinfo.winpercentage, reverse=True)
+    def sort_players(self, sort_by):
+        if sort_by == "wincount":
+            self.players_info = sorted(self.players_info, key=lambda players_info: players_info.wincount, reverse=True)
+        elif sort_by == "winpercentage":
+            self.players_info = sorted(self.players_info, key=lambda players_info: players_info.win_percentage,
+                                       reverse=True)
 
     def print_stats(self):
-        for player in self.playersInfo:
+        for player in self.players_info:
             if player.name in self.ignore:
                 continue
             print("\n")
             print(f'Name: {player.name}')
-            print(f'Wins: {str(player.wincount)}')
-            print(f'Loss: {str(player.losscount)}')
-            print(f'You have won {str(round(player.winpercentage,2))}% of the games you have played.')
-            print(f'Most of your wins have come from {player.winGameInfo.name}, with {str(player.winGameInfo.win)} '
-                  f'wins out of {str(player.winGameInfo.count)} games.')
-            print(f'Most of your loss have come from {player.lossGameInfo.name}, with {str(player.lossGameInfo.loss)} '
-                  f'loss out of {str(player.lossGameInfo.count)} games.')
-            print(f'Your h-index is: {str(player.hIndex)}')
+            print(f'Wins: {str(player.win_count)}')
+            print(f'Loss: {str(player.loss_count)}')
+            print(f'You have won {str(round(player.win_percentage, 2))}% of the games you have played.')
+            print(f'Most of your wins have come from {player.win_info.name}, with {str(player.win_info.win)} '
+                  f'wins out of {str(player.win_info.count)} games.')
+            print(f'Most of your loss have come from {player.loss_info.name}, with {str(player.loss_info.loss)} '
+                  f'loss out of {str(player.loss_info.count)} games.')
+            print(f'Your h-index is: {str(player.h_index)}')
             # print(f'For every 1 games you have won, you have lost {str(player.winratio)} game.')
-            print(f'Total Games Played: {str(player.wincount + player.losscount)}')
+            print(f'Total Games Played: {str(player.win_count + player.loss_count)}')
+            print(f'You have: {str(player.points)} points.')
+            print(f'You get: {str(player.points_per_game)} points per game.')
 
 
 if __name__ == "__main__":
