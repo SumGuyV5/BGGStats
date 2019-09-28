@@ -14,6 +14,7 @@
 **		    see license.txt for for details	        **
 ***************************************************************"""
 import os
+import operator
 import BGGModule.Functions
 
 from BGGModule.ReadXML import ReadXML
@@ -45,20 +46,13 @@ class BGGStats:
             self.downloadXML.download_all(self.url, "plays", count_to)
         self.readXML.read_xml_all(os.path.join(os.getcwd(), "plays"), count_to)
             
-        self.players_info = self.readXML.load_info()
-        self.sort_players("winpercentage")
+        self.players_info = self.readXML.load_info(self.ignore)
+        self.players_info = sorted(self.players_info, key=operator.attrgetter('win_percentage'), reverse=True)
         self.print_stats()
 
     def download(self, number):
         self.downloadXML.url = self.url + str(number)
         self.downloadXML.download()
-
-    def sort_players(self, sort_by):
-        if sort_by == "wincount":
-            self.players_info = sorted(self.players_info, key=lambda players_info: players_info.wincount, reverse=True)
-        elif sort_by == "winpercentage":
-            self.players_info = sorted(self.players_info, key=lambda players_info: players_info.win_percentage,
-                                       reverse=True)
 
     def print_stats(self):
         for player in self.players_info:
