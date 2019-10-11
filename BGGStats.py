@@ -38,15 +38,15 @@ class BGGStats:
         
         self.downloadXML = DownloadXML(self.url, self.filename)
         self.readXML = ReadXML()
-        self.re_download = False
+        self.re_download = True
 
     def main(self):
-        count_to = BGGModule.Functions.play_count(self.username, self.pagesize)
+        count_to = BGGModule.Functions.count_to(self.username, self.pagesize)
         if self.re_download:
             self.downloadXML.download_all(self.url, "plays", count_to)
         self.readXML.read_xml_all(os.path.join(os.getcwd(), "plays"), count_to)
             
-        self.players_info = self.readXML.load_info(self.ignore)
+        self.players_info = BGGModule.Functions.load_info(self.ignore, self.readXML.plays)
         self.players_info = sorted(self.players_info, key=operator.attrgetter('win_percentage'), reverse=True)
         self.print_stats()
 
